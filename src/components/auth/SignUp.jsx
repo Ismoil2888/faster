@@ -105,7 +105,7 @@ const SignUp = () => {
         {error && <p style={{ color: "red" }}>{error}</p>}
         <div className="register-link">
         <p>
-          Already have an account? <Link to="/">Login</Link>
+          Already have an account? <Link className="a" to="/">Login</Link>
         </p>
         </div>
       </form>

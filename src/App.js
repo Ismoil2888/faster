@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
-import './Registration.css'
+import './Registration.css';
 import SignUp from './components/auth/SignUp';
 import SignIn from './components/auth/SignIn';
 import AuthDetails from './components/auth/AuthDetails';
@@ -10,7 +10,7 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/" element={<SignIn />} />
+          <Route path="/iamfirst" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/authdetails" element={<AuthDetails />} />
         </Routes>
