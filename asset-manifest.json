@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/faster/static/css/main.99f89273.css",
+    "main.js": "/faster/static/js/main.9aa8d35f.js",
+    "static/js/453.01f1880f.chunk.js": "/faster/static/js/453.01f1880f.chunk.js",
+    "static/media/glavfone.jpg": "/faster/static/media/glavfone.4fa56a82e0e3209a04ac.jpg",
+    "index.html": "/faster/index.html",
+    "main.99f89273.css.map": "/faster/static/css/main.99f89273.css.map",
+    "main.9aa8d35f.js.map": "/faster/static/js/main.9aa8d35f.js.map",
+    "453.01f1880f.chunk.js.map": "/faster/static/js/453.01f1880f.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.99f89273.css",
+    "static/js/main.9aa8d35f.js"
+  ]
+}
