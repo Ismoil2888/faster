@@ -53,21 +53,6 @@
   margin: 5px;
 }
 
-.profile{
-  position: absolute;
-  top: 10%;
-  left: 30%;
-  width: 270px;
-  height: 180px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid grey;
-  padding: 5px;
-  border-radius: 10px;
-}
-
 .section {
   display: flex;
   justify-content: center;
@@ -197,3 +182,74 @@
       .register-link p:hover { 
         text-decoration: underline;
       }
+
+      .bodyauth{
+        background-color: rgb(65, 7, 7);
+        height: 100%;
+        width: 100%;
+        position: absolute;
+    }
+
+    .profile{
+      position: absolute;
+      top: 10%;
+      left: 30%;
+      width: 270px;
+      height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid rgb(56, 218, 3);
+      padding: 5px;
+      border-radius: 10px;
+      color: rgb(4, 255, 255);
+      background-color: rgb(114, 15, 15);
+    }
+
+    .profile button{
+      margin-top: 15px;
+    }
+
+    .authout{
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20%;
+      font-size: 30px;
+    }
+
+    .authoutlink{
+      text-decoration: none;
+      color: aqua;
+    }
+
+    .notfoundpagebody{
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: rgb(4, 172, 155);
+      z-index: 100;
+      position: absolute;
+  }
+  
+  .notfoundpage{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      margin-top: 20%;
+  }
+  
+  h1{
+      color: darkred;
+  }
+  
+  .homeback{
+      color: rgb(255, 255, 255);
+      font-size: 25px;
+      text-decoration: none;
+  }
