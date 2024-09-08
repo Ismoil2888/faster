@@ -9,7 +9,7 @@ export function NotfoundPage() {
        <div className='notfoundpage'>
         <h1>Страница не найдена</h1>
         <p>
-            <Link className='homeback' to="/signup">вернуться домой</Link>
+            <Link className='homeback' to="/signup">Вернуться домой</Link>
         </p>
        </div>
     </div>
