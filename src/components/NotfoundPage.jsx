@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from "react-router-dom";
-import SignUp from './auth/SignUp';
 
 
 export function NotfoundPage() {
@@ -9,7 +8,7 @@ export function NotfoundPage() {
        <div className='notfoundpage'>
         <h1>Страница не найдена</h1>
         <p>
-            <Link className='homeback' to="/signup">Вернуться домой</Link>
+            <Link className='homeback' to="/signup">Вернуться на главную страницу</Link>
         </p>
        </div>
     </div>
