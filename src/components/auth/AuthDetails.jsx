@@ -49,7 +49,7 @@ const AuthDetails = () => {
       ) : (
            <p className="authout">
              Signed Out
-            <Link className="authoutlink" to="/faster">Войти в аккаунт</Link>
+            <Link className="authoutlink" to="/">Войти в аккаунт</Link>
            </p>      
                 )}
     </div>
