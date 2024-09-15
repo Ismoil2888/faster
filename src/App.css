@@ -62,7 +62,7 @@
   background: url('/src/components/auth/glavfone.jpg') no-repeat;
   background-size: cover;
   background-position: center;
-  animation: animateBg 5s linear infinite;
+  /* animation: animateBg 5s linear infinite; */
   }
   
   @keyframes animateBg {

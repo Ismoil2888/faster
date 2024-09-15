@@ -8,7 +8,7 @@ export function NotfoundPage() {
        <div className='notfoundpage'>
         <h1>Страница не найдена</h1>
         <p>
-            <Link className='homeback' to="/signup">Вернуться на главную страницу</Link>
+            <Link className='homeback' to="/faster/signup">Вернуться на главную страницу</Link>
         </p>
        </div>
     </div>

@@ -22,7 +22,7 @@ const SignIn = () => {
         setError("");
         setEmail("");
         setPassword("");
-        window.location.href = "/authdetails"; // Перенаправление после успешного входа
+        window.location.href = '/faster/faster/authdetails'; // Перенаправление после успешного входа
       })
       .catch((error) => {
         console.log(error);
@@ -70,7 +70,7 @@ const SignIn = () => {
         {error && <p style={{ color: "red" }}>{error}</p>}
         <div className="register-link">
           <p>
-            Don't have an account? <Link to="/signup">Register</Link>
+            Don't have an account? <Link to="/faster/signup">Register</Link>
           </p>
         </div>
       </form>
