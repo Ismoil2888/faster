@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/faster/static/css/main.6141cd4c.css",
-    "main.js": "/faster/static/js/main.db8e52e3.js",
-    "static/js/453.01f1880f.chunk.js": "/faster/static/js/453.01f1880f.chunk.js",
-    "static/media/glavfone.jpg": "/faster/static/media/glavfone.4fa56a82e0e3209a04ac.jpg",
-    "index.html": "/faster/index.html",
-    "main.6141cd4c.css.map": "/faster/static/css/main.6141cd4c.css.map",
-    "main.db8e52e3.js.map": "/faster/static/js/main.db8e52e3.js.map",
-    "453.01f1880f.chunk.js.map": "/faster/static/js/453.01f1880f.chunk.js.map"
+    "main.css": "/faster/faster/static/css/main.ce509ecd.css",
+    "main.js": "/faster/faster/static/js/main.d727dc90.js",
+    "static/js/453.01f1880f.chunk.js": "/faster/faster/static/js/453.01f1880f.chunk.js",
+    "static/media/glavfone.jpg": "/faster/faster/static/media/glavfone.4fa56a82e0e3209a04ac.jpg",
+    "index.html": "/faster/faster/index.html",
+    "main.ce509ecd.css.map": "/faster/faster/static/css/main.ce509ecd.css.map",
+    "main.d727dc90.js.map": "/faster/faster/static/js/main.d727dc90.js.map",
+    "453.01f1880f.chunk.js.map": "/faster/faster/static/js/453.01f1880f.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.6141cd4c.css",
-    "static/js/main.db8e52e3.js"
+    "static/css/main.ce509ecd.css",
+    "static/js/main.d727dc90.js"
   ]
 }
