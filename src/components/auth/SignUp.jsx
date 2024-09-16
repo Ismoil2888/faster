@@ -36,7 +36,7 @@ const SignUp = () => {
         setUsername("");
 
         // Перенаправление на AuthDetails после регистрации
-        window.location.href = '/faster/faster/authdetails';
+        window.location.href = '/#/authdetails';
       })
       .catch((error) => {
         console.log(error);
