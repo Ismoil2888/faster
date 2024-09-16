@@ -258,3 +258,170 @@
       font-size: 25px;
       text-decoration: none;
   }
+
+
+
+
+
+
+
+  .status-online {
+    color: green;
+    font-weight: bold;
+  }
+  
+  .status-offline {
+    color: gray;
+    font-style: italic;
+  }
+  
+  .profile-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f7f7f7;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
+  
+  .avatar-upload-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  
+  .status-online {
+    color: green;
+    font-weight: bold;
+  }
+  
+  .status-offline {
+    color: gray;
+    font-style: italic;
+  }
+  
+  .username-section h2 {
+    margin: 0;
+    font-size: 20px;
+    color: rgb(8, 96, 168);
+  }
+  
+  .profile-info {
+    margin-top: 20px;
+  }
+  
+  .info-section {
+    margin-bottom: 15px;
+  }
+  
+  .info-section h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .info-section p {
+    margin: 5px 0 0;
+  }
+  
+  .settings {
+    margin-top: 30px;
+  }
+  
+  .settings h3 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .settings ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .settings li {
+    margin-bottom: 10px;
+  }
+  
+  .signout-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #ff4b4b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .signed-out {
+    text-align: center;
+    font-size: 16px;
+  }
+  
+  .authoutlink {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+  }  
+
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .full-size-avatar {
+    max-width: 90%;
+    max-height: 90%;
+  }
+  
+  .modal-confirm {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  .modal-confirm p {
+    margin-bottom: 20px;
+  }
+  
+  .modal-confirm button {
+    margin: 0 10px;
+    padding: 10px 20px;
+  }
+  
