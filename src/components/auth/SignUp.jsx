@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { auth, database } from "../../firebase";  // Обязательно импортируйте и database
 import { Link } from "react-router-dom";
 
+
 const SignUp = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -75,8 +76,8 @@ const SignUp = () => {
            <label>Email</label>
          </div>
          <div className="reg-input-box">
-           <span className="icon">
-             <ion-icon name="lock-closed"></ion-icon>
+           <span className="icon far fa-eye">
+             <ion-icon id="eye-icon" name="eye"></ion-icon>
            </span>
            <input
              type="password"

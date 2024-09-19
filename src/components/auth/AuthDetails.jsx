@@ -1,7 +1,7 @@
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"; // Добавил deleteObject для удаления
 import { ref as databaseRef, onValue, update } from "firebase/database";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { auth, database, storage } from "../../firebase"; // Правильные экспорты
 import { Link } from "react-router-dom";
 import { FaEllipsisV } from "react-icons/fa"; // Иконка для меню
@@ -13,12 +13,24 @@ const AuthDetails = () => {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("offline");
   const [lastActive, setLastActive] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("/default-image.png"); // Default avatar URL
+  const [avatarUrl, setAvatarUrl] = useState("./default-image.png"); // Default avatar URL
   const [showMenu, setShowMenu] = useState(false); // Для показа меню
   const [newUsername, setNewUsername] = useState(""); // Для изменения имени пользователя
   const [isEditingUsername, setIsEditingUsername] = useState(false); // Режим редактирования имени
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false); // Модальное окно для аватарки
+
+  const menuRef = useRef(null); // Для отслеживания кликов вне меню
 
   useEffect(() => {
+    // Слушатель для клика вне меню
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Firebase auth listener
     const listen = onAuthStateChanged(auth, (user) => {
       if (user) {
         setAuthUser(user);
@@ -33,7 +45,7 @@ const AuthDetails = () => {
             setPhoneNumber(data.phoneNumber || "+Введите номер телефона");
             setStatus(data.status || "offline");
             setLastActive(data.lastActive || "");
-            setAvatarUrl(data.avatarUrl || "/default-image.png"); // Set avatar URL from DB
+            setAvatarUrl(data.avatarUrl || "./default-image.png"); // Set avatar URL from DB
           }
         });
 
@@ -51,13 +63,13 @@ const AuthDetails = () => {
         setPhoneNumber("");
         setStatus("offline");
         setLastActive("");
-        setAvatarUrl("/default-image.png");
+        setAvatarUrl("./default-image.png");
       }
     });
 
     return () => {
       listen();
-      window.removeEventListener('beforeunload', () => {}); // Очистка
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -80,6 +92,7 @@ const AuthDetails = () => {
         await update(userDatabaseRef, { avatarUrl: downloadURL });
 
         console.log('Avatar updated successfully!');
+        setShowMenu(false); // Закрыть меню после загрузки
       } catch (error) {
         console.error("Ошибка при загрузке изображения:", error);
       }
@@ -95,9 +108,9 @@ const AuthDetails = () => {
 
         // Обновляем аватар в базе данных на значение по умолчанию
         const userDatabaseRef = databaseRef(database, 'users/' + authUser.uid);
-        await update(userDatabaseRef, { avatarUrl: "/default-image.png" });
+        await update(userDatabaseRef, { avatarUrl: "./default-image.png" });
 
-        setAvatarUrl("/default-image.png"); // Обновляем аватар локально
+        setAvatarUrl("./default-image.png"); // Обновляем аватар локально
         setShowMenu(false); // Закрываем меню
         console.log('Avatar deleted successfully!');
       } catch (error) {
@@ -145,7 +158,12 @@ const AuthDetails = () => {
         <div className="profile-content">
           <div className="profile-header">
             <div className="avatar-section">
-              <img src={avatarUrl} alt="Avatar" className="avatar" />
+              <img
+                src={avatarUrl}
+                alt="Avatar"
+                className="avatar"
+                onClick={() => setIsAvatarModalOpen(true)} // Открыть модальное окно при клике на аватар
+              />
               <label htmlFor="avatarInput" className="avatar-upload-btn">
                 Загрузить фото
               </label>
@@ -168,7 +186,7 @@ const AuthDetails = () => {
             </div>
 
             {showMenu && (
-              <div className="menu-dropdown">
+              <div className="menu-dropdown" ref={menuRef}>
                 <button onClick={() => document.getElementById('avatarInput').click()}>Добавить фото профиля</button>
                 <button onClick={deleteAvatar}>Удалить фото профиля</button>
                 <button onClick={() => setIsEditingUsername(true)}>Изменить имя пользователя</button>
@@ -220,6 +238,20 @@ const AuthDetails = () => {
           <button className="signout-btn" onClick={userSignOut}>
             Выйти из аккаунта
           </button>
+
+          {/* Модальное окно для отображения аватарки во весь экран */}
+          {isAvatarModalOpen && (
+            <div className="avatar-modal" onClick={() => setIsAvatarModalOpen(false)}>
+              <div className="avatar-overlay">
+                <img
+                  src={avatarUrl}
+                  alt="Full-size Avatar"
+                  className="full-size-avatar"
+                  onClick={() => setIsAvatarModalOpen(false)} // Закрыть окно при клике на аватар
+                />
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="signed-out">
