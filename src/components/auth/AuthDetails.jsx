@@ -1,10 +1,10 @@
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"; // Добавил deleteObject для удаления
+import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { ref as databaseRef, onValue, update } from "firebase/database";
 import React, { useEffect, useState, useRef } from "react";
-import { auth, database, storage } from "../../firebase"; // Правильные экспорты
+import { auth, database, storage } from "../../firebase";
 import { Link } from "react-router-dom";
-import { FaEllipsisV } from "react-icons/fa"; // Иконка для меню
+import { FaEllipsisV, FaTimes } from "react-icons/fa"; // Иконка крестика
 
 const AuthDetails = () => {
   const [authUser, setAuthUser] = useState(null);
@@ -13,16 +13,19 @@ const AuthDetails = () => {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("offline");
   const [lastActive, setLastActive] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("./default-image.png"); // Default avatar URL
-  const [showMenu, setShowMenu] = useState(false); // Для показа меню
-  const [newUsername, setNewUsername] = useState(""); // Для изменения имени пользователя
-  const [isEditingUsername, setIsEditingUsername] = useState(false); // Режим редактирования имени
-  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false); // Модальное окно для аватарки
+  const [avatarUrl, setAvatarUrl] = useState("./default-image.png");
+  const [showMenu, setShowMenu] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [aboutMe, setAboutMe] = useState("Напишите немного о себе");
+  const [newAboutMe, setNewAboutMe] = useState("");
+  const [isEditingAboutMe, setIsEditingAboutMe] = useState(false);
+  const [notification, setNotification] = useState(""); // Для уведомления
 
-  const menuRef = useRef(null); // Для отслеживания кликов вне меню
+  const menuRef = useRef(null);
 
   useEffect(() => {
-    // Слушатель для клика вне меню
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setShowMenu(false);
@@ -30,13 +33,11 @@ const AuthDetails = () => {
     };
     document.addEventListener("mousedown", handleClickOutside);
 
-    // Firebase auth listener
     const listen = onAuthStateChanged(auth, (user) => {
       if (user) {
         setAuthUser(user);
         setEmail(user.email);
 
-        // Получаем информацию о пользователе из Realtime Database
         const userRef = databaseRef(database, 'users/' + user.uid);
         onValue(userRef, (snapshot) => {
           const data = snapshot.val();
@@ -45,14 +46,13 @@ const AuthDetails = () => {
             setPhoneNumber(data.phoneNumber || "+Введите номер телефона");
             setStatus(data.status || "offline");
             setLastActive(data.lastActive || "");
-            setAvatarUrl(data.avatarUrl || "./default-image.png"); // Set avatar URL from DB
+            setAvatarUrl(data.avatarUrl || "./default-image.png");
+            setAboutMe(data.aboutMe || "Напишите немного о себе");
           }
         });
 
-        // Устанавливаем статус "online"
         update(userRef, { status: "online" });
 
-        // Обновляем статус на "offline" при закрытии окна
         window.addEventListener('beforeunload', () => {
           update(userRef, { status: "offline", lastActive: new Date().toLocaleString() });
         });
@@ -73,76 +73,84 @@ const AuthDetails = () => {
     };
   }, []);
 
-  // Функция для загрузки нового аватара
+  // Функция для уведомлений
+  const showNotification = (message) => {
+    setNotification(message);
+    setTimeout(() => {
+      setNotification("");
+    }, 3000); // Уведомление исчезнет через 3 секунды
+  };
+
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (file && authUser) {
       try {
-        const avatarStorageRef = storageRef(storage, `avatars/${authUser.uid}`); // Ref for storage
-
-        // Загрузка файла в Firebase Storage
+        const avatarStorageRef = storageRef(storage, `avatars/${authUser.uid}`);
         const snapshot = await uploadBytes(avatarStorageRef, file);
-
-        // Получение URL загруженного изображения
         const downloadURL = await getDownloadURL(avatarStorageRef);
-        setAvatarUrl(downloadURL); // Обновляем URL аватара локально
-
-        // Обновляем данные в Realtime Database
+        setAvatarUrl(downloadURL);
         const userDatabaseRef = databaseRef(database, 'users/' + authUser.uid);
         await update(userDatabaseRef, { avatarUrl: downloadURL });
-
-        console.log('Avatar updated successfully!');
-        setShowMenu(false); // Закрыть меню после загрузки
+        setShowMenu(false);
       } catch (error) {
         console.error("Ошибка при загрузке изображения:", error);
       }
     }
   };
 
-  // Функция для удаления аватара
   const deleteAvatar = async () => {
     if (authUser) {
       try {
         const avatarStorageRef = storageRef(storage, `avatars/${authUser.uid}`);
-        await deleteObject(avatarStorageRef); // Удаление файла из Firebase Storage
-
-        // Обновляем аватар в базе данных на значение по умолчанию
+        await deleteObject(avatarStorageRef);
         const userDatabaseRef = databaseRef(database, 'users/' + authUser.uid);
         await update(userDatabaseRef, { avatarUrl: "./default-image.png" });
-
-        setAvatarUrl("./default-image.png"); // Обновляем аватар локально
-        setShowMenu(false); // Закрываем меню
-        console.log('Avatar deleted successfully!');
+        setAvatarUrl("./default-image.png");
+        setShowMenu(false);
       } catch (error) {
         console.error("Ошибка при удалении изображения:", error);
       }
     }
   };
 
-  // Функция для изменения имени пользователя
   const handleUsernameChange = async () => {
-    if (authUser && newUsername.trim() !== "") {
+    const usernameRegex = /^[a-zA-Z0-9._]+$/; // Валидация имени пользователя
+    if (authUser && newUsername.trim() !== "" && usernameRegex.test(newUsername)) {
       try {
         const userDatabaseRef = databaseRef(database, 'users/' + authUser.uid);
         await update(userDatabaseRef, { username: newUsername });
         setUsername(newUsername);
-        setIsEditingUsername(false); // Выход из режима редактирования
-        setShowMenu(false); // Закрываем меню
-        console.log("Username updated successfully!");
+        setIsEditingUsername(false);
+        showNotification(`Имя изменено на "${newUsername}"`);
       } catch (error) {
         console.error("Ошибка при изменении имени пользователя:", error);
+      }
+    } else {
+      showNotification("Имя пользователя может содержать только буквы, цифры, нижнее подчеркивание и точку.");
+    }
+  };
+
+  const handleAboutMeChange = async () => {
+    if (authUser) {
+      const aboutText = newAboutMe.trim() === "" ? "Напишите немного о себе" : newAboutMe;
+      try {
+        const userDatabaseRef = databaseRef(database, 'users/' + authUser.uid);
+        await update(userDatabaseRef, { aboutMe: aboutText });
+        setAboutMe(aboutText);
+        setIsEditingAboutMe(false);
+        showNotification(`Информация "О себе" обновлена`);
+      } catch (error) {
+        console.error("Ошибка при изменении информации 'О себе':", error);
       }
     }
   };
 
-  function userSignOut() {
+  const userSignOut = () => {
     const userRef = databaseRef(database, 'users/' + authUser.uid);
     update(userRef, { status: "offline", lastActive: new Date().toLocaleString() }).then(() => {
-      signOut(auth)
-        .then(() => console.log("Successfully signed out!"))
-        .catch((e) => console.log(e));
+      signOut(auth).then(() => console.log("Successfully signed out!")).catch((e) => console.log(e));
     });
-  }
+  };
 
   const renderStatus = () => {
     if (status === "online") {
@@ -156,17 +164,17 @@ const AuthDetails = () => {
     <div className="profile-container">
       {authUser ? (
         <div className="profile-content">
+          {notification && <div className="notification">{notification}</div>} {/* Уведомление */}
+
           <div className="profile-header">
             <div className="avatar-section">
               <img
                 src={avatarUrl}
                 alt="Avatar"
                 className="avatar"
-                onClick={() => setIsAvatarModalOpen(true)} // Открыть модальное окно при клике на аватар
+                onClick={() => setIsAvatarModalOpen(true)}
               />
-              <label htmlFor="avatarInput" className="avatar-upload-btn">
-                Загрузить фото
-              </label>
+              <label htmlFor="avatarInput" className="avatar-upload-btn">Загрузить фото</label>
               <input
                 type="file"
                 id="avatarInput"
@@ -180,7 +188,6 @@ const AuthDetails = () => {
               <p>{renderStatus()}</p>
             </div>
 
-            {/* Меню с тремя точками */}
             <div className="menu-icon" onClick={() => setShowMenu(!showMenu)}>
               <FaEllipsisV />
             </div>
@@ -203,6 +210,7 @@ const AuthDetails = () => {
                 placeholder="Новое имя пользователя"
               />
               <button onClick={handleUsernameChange}>Изменить</button>
+              <FaTimes className="close-icon" onClick={() => setIsEditingUsername(false)} /> {/* Кнопка крестика */}
             </div>
           )}
 
@@ -213,9 +221,22 @@ const AuthDetails = () => {
             </div>
 
             <div className="info-section">
-              <h3>О себе</h3>
-              <p>Напишите немного о себе</p>
+              <h3 onClick={() => setIsEditingAboutMe(true)}>О себе</h3> {/* Открыть редактирование */}
+              <p>{aboutMe}</p>
             </div>
+
+            {isEditingAboutMe && (
+              <div className="edit-aboutme-section">
+                <textarea
+                  type="text"
+                  value={newAboutMe}
+                  onChange={(e) => setNewAboutMe(e.target.value)}
+                  placeholder="Расскажите о себе"
+                />
+                <button onClick={handleAboutMeChange}>Сохранить</button>
+                <FaTimes className="close-icon" onClick={() => setIsEditingAboutMe(false)} /> {/* Кнопка крестика */}
+              </div>
+            )}
 
             <div className="info-section">
               <h3>Конфиденциальность</h3>
@@ -235,19 +256,16 @@ const AuthDetails = () => {
             </div>
           </div>
 
-          <button className="signout-btn" onClick={userSignOut}>
-            Выйти из аккаунта
-          </button>
+          <button className="signout-btn" onClick={userSignOut}>Выйти из аккаунта</button>
 
-          {/* Модальное окно для отображения аватарки во весь экран */}
           {isAvatarModalOpen && (
             <div className="avatar-modal" onClick={() => setIsAvatarModalOpen(false)}>
               <div className="avatar-overlay">
                 <img
                   src={avatarUrl}
-                  alt="Full-size Avatar"
+                  alt="Avatar"
                   className="full-size-avatar"
-                  onClick={() => setIsAvatarModalOpen(false)} // Закрыть окно при клике на аватар
+                  onClick={() => setIsAvatarModalOpen(false)}
                 />
               </div>
             </div>
@@ -264,7 +282,6 @@ const AuthDetails = () => {
 };
 
 export default AuthDetails;
-
 
 
 

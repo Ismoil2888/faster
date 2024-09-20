@@ -3,11 +3,23 @@
   padding: 0;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   }
 
   body{
     overflow: hidden;
   }
+
+  input{
+    border: 2px solid cadetblue;
+  }
+
+ input:user-invalid{
+  border-color: red;
+ }
 
 .loginblock{
   position: absolute;
@@ -631,3 +643,82 @@
   .modal-confirm button:last-child:hover {
     background-color: #5a6268;
   }  
+
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    animation: fadeInOut 3s ease-in-out;
+    z-index: 1000;
+  }
+
+  @keyframes fadeInOut {
+    0% {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    10% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    90% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
+
+  .close-icon {
+    font-size: 25px;
+    cursor: pointer;
+    color: #999;
+    margin-left: 10px;
+  }
+  
+  .close-icon:hover {
+    color: #333;
+  }
+  
+  /* Стили для окна редактирования "О себе" */
+  .edit-aboutme-section {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+  }
+  
+  .edit-aboutme-section textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    resize: none;
+  }
+  
+  .edit-aboutme-section button {
+    align-self: flex-start;
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .edit-aboutme-section button:hover {
+    background-color: #0056b3;
+  }
