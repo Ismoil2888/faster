@@ -1,10 +1,13 @@
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-import { ref as databaseRef, onValue, update } from "firebase/database";
+import { ref as databaseRef, onValue, update, get, query, orderByChild, equalTo } from "firebase/database";
 import React, { useEffect, useState, useRef } from "react";
 import { auth, database, storage } from "../../firebase";
 import { Link } from "react-router-dom";
 import { FaEllipsisV, FaTimes } from "react-icons/fa"; // Иконка крестика
+import { FaEnvelope, FaArrowLeft } from "react-icons/fa";
+import { useParams, useNavigate } from "react-router-dom";
+
 
 const AuthDetails = () => {
   const [authUser, setAuthUser] = useState(null);
@@ -22,6 +25,8 @@ const AuthDetails = () => {
   const [newAboutMe, setNewAboutMe] = useState("");
   const [isEditingAboutMe, setIsEditingAboutMe] = useState(false);
   const [notification, setNotification] = useState(""); // Для уведомления
+  const [notificationType, setNotificationType] = useState(""); // Для типа уведомления
+  const navigate = useNavigate();
 
   const menuRef = useRef(null);
 
@@ -73,12 +78,24 @@ const AuthDetails = () => {
     };
   }, []);
 
-  // Функция для уведомлений
+  // Функция для успешных уведомлений
   const showNotification = (message) => {
+    setNotificationType("success");
     setNotification(message);
     setTimeout(() => {
       setNotification("");
-    }, 3000); // Уведомление исчезнет через 3 секунды
+      setNotificationType("");
+    }, 3000);
+  };
+
+  // Функция для ошибочных уведомлений
+  const showNotificationError = (message) => {
+    setNotificationType("error");
+    setNotification(message);
+    setTimeout(() => {
+      setNotification("");
+      setNotificationType("");
+    }, 3000);
   };
 
   const handleAvatarChange = async (e) => {
@@ -117,6 +134,15 @@ const AuthDetails = () => {
     const usernameRegex = /^[a-zA-Z0-9._]+$/; // Валидация имени пользователя
     if (authUser && newUsername.trim() !== "" && usernameRegex.test(newUsername)) {
       try {
+        // Проверяем, существует ли уже пользователь с таким именем
+        const usersRef = query(databaseRef(database, 'users'), orderByChild('username'), equalTo(newUsername));
+        const snapshot = await get(usersRef);
+        if (snapshot.exists()) {
+          showNotificationError("Пользователь с таким именем уже существует, выберите другое имя.");
+          return;
+        }
+
+        // Если имя уникально, обновляем
         const userDatabaseRef = databaseRef(database, 'users/' + authUser.uid);
         await update(userDatabaseRef, { username: newUsername });
         setUsername(newUsername);
@@ -126,7 +152,7 @@ const AuthDetails = () => {
         console.error("Ошибка при изменении имени пользователя:", error);
       }
     } else {
-      showNotification("Имя пользователя может содержать только буквы, цифры, нижнее подчеркивание и точку.");
+      showNotificationError("Имя пользователя может содержать только буквы, цифры, нижнее подчеркивание и точку.");
     }
   };
 
@@ -162,9 +188,16 @@ const AuthDetails = () => {
 
   return (
     <div className="profile-container">
+       <div className="back-button" onClick={() => navigate(-1)}>
+        <FaArrowLeft />
+      </div>
       {authUser ? (
         <div className="profile-content">
-          {notification && <div className="notification">{notification}</div>} {/* Уведомление */}
+          {notification && (
+            <div className={`notification ${notificationType}`}>
+              {notification}
+            </div>
+         )} {/* Уведомление */}
 
           <div className="profile-header">
             <div className="avatar-section">
