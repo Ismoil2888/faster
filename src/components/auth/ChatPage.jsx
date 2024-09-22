@@ -90,16 +90,36 @@ const ChatPage = () => {
     localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
   };
 
+  // Добавление обработчика для перехода на профиль из истории
+  const goToProfileFromHistory = (userId) => {
+    navigate(`/profile/${userId}`);
+  };
+
   return (
     <div className="chat-page">
       <div className="header">
         <div className="menu-icon" onClick={() => setShowMenu(!showMenu)}>
           <FaEllipsisV />
         </div>
-        <h1>Faster</h1>
-        <div className="search-icon" onClick={() => setShowSearch(!showSearch)}>
-          <FaSearch />
+
+      {/* Секция для отображения историй */}
+      <div className="stories-section">
+        <div className="story-item">
+          <img
+            src="./default-story.png"
+            alt="Моя история"
+            className="story-avatar"
+          />
+          <p>Моя история</p>
         </div>
+        {/* Добавьте другие истории пользователей здесь */}
+      </div>
+
+      {/* <h1>Faster</h1> */}
+
+      <div className="search-icon" onClick={() => setShowSearch(!showSearch)}>
+          <FaSearch />
+      </div>
       </div>
 
       {showMenu && (
@@ -136,7 +156,11 @@ const ChatPage = () => {
                 </span>
               </div>
               {searchHistory.map((user) => (
-                <div key={user.uid} className="chat-item">
+                <div
+                  key={user.uid}
+                  className="chat-item"
+                  onClick={() => goToProfileFromHistory(user.uid)} // Добавляем обработчик клика
+                >
                   <img src={user.avatarUrl || "./default-image.png"} alt={user.username} className="avatarka" />
                   <div className="chat-info">
                     <h3>{user.username}</h3>
@@ -164,7 +188,7 @@ const ChatPage = () => {
               </div>
             ))
           ) : (
-            searchQuery.trim() !== "" && <p>No results found</p> // Условие, показывающее сообщение, если есть запрос и результаты пустые
+            searchQuery.trim() !== "" && <p>No results found</p>
           )}
         </div>
       )}
