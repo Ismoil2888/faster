@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/faster/static/css/main.598c263a.css",
-    "main.js": "/faster/static/js/main.aafdc570.js",
+    "main.css": "/faster/static/css/main.91d81995.css",
+    "main.js": "/faster/static/js/main.5dbb2851.js",
     "static/js/453.01f1880f.chunk.js": "/faster/static/js/453.01f1880f.chunk.js",
     "static/media/glavfone12.png": "/faster/static/media/glavfone12.2f011f8b3d0b2a503263.png",
     "index.html": "/faster/index.html",
-    "main.598c263a.css.map": "/faster/static/css/main.598c263a.css.map",
-    "main.aafdc570.js.map": "/faster/static/js/main.aafdc570.js.map",
+    "main.91d81995.css.map": "/faster/static/css/main.91d81995.css.map",
+    "main.5dbb2851.js.map": "/faster/static/js/main.5dbb2851.js.map",
     "453.01f1880f.chunk.js.map": "/faster/static/js/453.01f1880f.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.598c263a.css",
-    "static/js/main.aafdc570.js"
+    "static/css/main.91d81995.css",
+    "static/js/main.5dbb2851.js"
   ]
 }
