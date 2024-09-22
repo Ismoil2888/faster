@@ -1,28 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getDatabase, ref as databaseRef, get } from "firebase/database";
+import { getDatabase, ref as databaseRef, onValue, serverTimestamp, onDisconnect } from "firebase/database";
 import { FaEnvelope, FaArrowLeft } from "react-icons/fa";
 
 const UserProfilePage = () => {
   const { userId } = useParams();
   const [userData, setUserData] = useState(null);
-  const [onlineStatus, setOnlineStatus] = useState("offline");
-  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false); // Состояние для открытия модального окна
+  const [onlineStatus, setOnlineStatus] = useState("");
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const db = getDatabase();
-        const userRef = databaseRef(db, `users/${userId}`);
-        const snapshot = await get(userRef);
+    const db = getDatabase();
+    const userRef = databaseRef(db, `users/${userId}`);
 
-        if (snapshot.exists()) {
-          setUserData(snapshot.val());
-          setOnlineStatus("online"); // Предполагаемый статус онлайн
+    // Функция для получения данных пользователя из Realtime Database
+    const fetchUserData = async () => {
+      onValue(userRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          setUserData(data);
+          updateStatus(userId, data.status, data.lastActive); // Обновляем статус
         }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+      });
+    };
+
+    // Функция для обновления статуса
+    const updateStatus = (userId, status, lastActive) => {
+      if (status === "online") {
+        setOnlineStatus("в сети");
+      } else if (lastActive) {
+        setOnlineStatus(`был(а) в сети: ${lastActive}`);
+      } else {
+        setOnlineStatus("offline");
       }
     };
 
@@ -34,37 +44,41 @@ const UserProfilePage = () => {
   }
 
   const handleAvatarClick = () => {
-    setIsAvatarModalOpen(true); // Открываем модальное окно
+    setIsAvatarModalOpen(true); // Открыть модальное окно для аватара
   };
 
   const closeAvatarModal = () => {
-    setIsAvatarModalOpen(false); // Закрываем модальное окно
+    setIsAvatarModalOpen(false); // Закрыть модальное окно для аватара
   };
 
   return (
     <div className="user-profile">
-      {/* Стрелка назад */}
+      {/* Кнопка назад */}
       <div className="back-button" onClick={() => navigate(-1)}>
         <FaArrowLeft />
       </div>
 
-      {/* Аватарка пользователя */}
-      <img
-        src={userData.avatarUrl || "./default-image.png"}
-        alt={userData.username}
-        className="avatar-large"
-        onClick={handleAvatarClick} // Открыть фото при клике
-      />
+      {/* Контейнер для аватарки и имени */}
+      <div className="avatar-container">
+        {/* Аватар пользователя */}
+        <img
+          src={userData.avatarUrl || "./default-image.png"}
+          alt={userData.username}
+          className="avatar-large"
+          onClick={handleAvatarClick} // Открыть модальное окно при клике
+        />
+        {/* Имя пользователя */}
+        <h2 className="username">{userData.username}</h2>
+      </div>
 
-      <h2>{userData.username}</h2>
-      <p>Status: {onlineStatus === "online" ? "Online" : "Last seen at ..."} </p>
-      <p>About: {userData.aboutMe || "No additional info"}</p>
+      <p>{onlineStatus}</p>
+      <p>Информация: {userData.aboutMe || "No additional info"}</p>
 
       <button className="message-button">
         <FaEnvelope /> Send Message
       </button>
 
-      {/* Модальное окно с аватаром во весь экран */}
+      {/* Модальное окно для аватара */}
       {isAvatarModalOpen && (
         <div className="avatar-modal" onClick={closeAvatarModal}>
           <div className="avatar-modal-content">

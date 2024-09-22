@@ -6,8 +6,6 @@ import { auth, database, storage } from "../../firebase";
 import { Link } from "react-router-dom";
 import { FaEllipsisV, FaTimes } from "react-icons/fa"; // Иконка крестика
 import { FaEnvelope, FaArrowLeft } from "react-icons/fa";
-import { useParams, useNavigate } from "react-router-dom";
-
 
 const AuthDetails = () => {
   const [authUser, setAuthUser] = useState(null);
@@ -21,13 +19,11 @@ const AuthDetails = () => {
   const [newUsername, setNewUsername] = useState("");
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
-  const [aboutMe, setAboutMe] = useState("Напишите немного о себе");
+  const [aboutMe, setAboutMe] = useState("Информация не указана");
   const [newAboutMe, setNewAboutMe] = useState("");
   const [isEditingAboutMe, setIsEditingAboutMe] = useState(false);
   const [notification, setNotification] = useState(""); // Для уведомления
   const [notificationType, setNotificationType] = useState(""); // Для типа уведомления
-  const navigate = useNavigate();
-
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -52,7 +48,7 @@ const AuthDetails = () => {
             setStatus(data.status || "offline");
             setLastActive(data.lastActive || "");
             setAvatarUrl(data.avatarUrl || "./default-image.png");
-            setAboutMe(data.aboutMe || "Напишите немного о себе");
+            setAboutMe(data.aboutMe || "Информация не указана");
           }
         });
 
@@ -158,7 +154,7 @@ const AuthDetails = () => {
 
   const handleAboutMeChange = async () => {
     if (authUser) {
-      const aboutText = newAboutMe.trim() === "" ? "Напишите немного о себе" : newAboutMe;
+      const aboutText = newAboutMe.trim() === "" ? "Информация не указана" : newAboutMe;
       try {
         const userDatabaseRef = databaseRef(database, 'users/' + authUser.uid);
         await update(userDatabaseRef, { aboutMe: aboutText });
@@ -182,15 +178,15 @@ const AuthDetails = () => {
     if (status === "online") {
       return <span className="status-online">в сети</span>;
     } else {
-      return <span className="status-offline">был(а) недавно: {lastActive}</span>;
+      return <span className="status-offline">был(а) в сети: {lastActive}</span>;
     }
   };
 
   return (
     <div className="profile-container">
-       <div className="back-button" onClick={() => navigate(-1)}>
+       <Link className="back-button" to="/chatpage">
         <FaArrowLeft />
-      </div>
+      </Link>
       {authUser ? (
         <div className="profile-content">
           {notification && (
