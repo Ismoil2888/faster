@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase";
 import { Link } from "react-router-dom";
+import { IoEyeOutline, IoEyeOffOutline, IoMailOutline } from "react-icons/io5";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // Состояние для показа/скрытия пароля
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -22,7 +23,7 @@ const SignIn = () => {
         setError("");
         setEmail("");
         setPassword("");
-        window.location.href = '#/authdetails'; // Перенаправление после успешного входа
+        window.location.href = "#/authdetails"; // Перенаправление после успешного входа
       })
       .catch((error) => {
         console.log(error);
@@ -32,49 +33,49 @@ const SignIn = () => {
 
   return (
     <div className="section">
-    <div className="login-box">
-      <form onSubmit={logIn}>
-        <h2>Login</h2>
-        <div className="input-box">
-          <span className="icon">
-            <ion-icon name="mail"></ion-icon>
-          </span>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <label>Email</label>
-        </div>
-        <div className="input-box">
-          <span className="icon far fa-eye" onClick={togglePasswordVisibility}>
-            <ion-icon id="eye-icon" name={showPassword ? "eye-off" : "eye"}></ion-icon>
-          </span>
-          <input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <label htmlFor="password">Password</label>
-        </div>
-        <div className="remember-forgot">
-          <label>
-            <input type="checkbox" /> Remember me
-          </label>
-          <p>Forgot Password?</p>
-        </div>
-        <button type="submit">Login</button>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <div className="register-link">
-          <p>
-            Don't have an account? <Link className="a" to="/signup">Register</Link>
-          </p>
-        </div>
-      </form>
-    </div>
+      <div className="login-box">
+        <form onSubmit={logIn}>
+          <h2>Login</h2>
+          <div className="input-box">
+            <span className="icon">
+              <IoMailOutline /> {/* Иконка email */}
+            </span>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <label>Email</label>
+          </div>
+          <div className="input-box">
+            <span className="icon" onClick={togglePasswordVisibility} style={{ cursor: "pointer" }}>
+              {showPassword ? <IoEyeOutline /> : <IoEyeOffOutline />} {/* Переключение иконки */}
+            </span>
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"} // Переключение типа input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <label htmlFor="password">Password</label>
+          </div>
+          <div className="remember-forgot">
+            <label>
+              <input type="checkbox" /> Remember me
+            </label>
+            <p>Forgot Password?</p>
+          </div>
+          <button type="submit">Login</button>
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          <div className="register-link">
+            <p>
+              Don't have an account? <Link className="a" to="/signup">Register</Link>
+            </p>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

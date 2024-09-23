@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaEllipsisV, FaSearch, FaTimes } from "react-icons/fa";
-import { getDatabase, ref as databaseRef, query, orderByChild, startAt, endAt, get, set } from "firebase/database"; // Добавляем set для записи
+import { getDatabase, ref as databaseRef, query, orderByChild, startAt, endAt, get } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
@@ -10,7 +10,7 @@ const ChatPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searchHistory, setSearchHistory] = useState([]);
-  const [isInputFocused, setIsInputFocused] = useState(false);
+  const [isInputFocused, setIsInputFocused] = useState(false); // Новое состояние
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const [userUid, setUserUid] = useState(null);
@@ -19,20 +19,16 @@ const ChatPage = () => {
     const auth = getAuth();
 
     // Отслеживаем аутентификацию пользователя
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         // Пользователь вошел в систему, используем его UID
         setUserUid(user.uid);
 
-        // Загружаем историю поиска для конкретного пользователя из Firebase
-        const dbRef = databaseRef(getDatabase(), `searchHistory/${user.uid}`);
-        const snapshot = await get(dbRef);
-
-        if (snapshot.exists()) {
-          setSearchHistory(snapshot.val() || []);
-        }
+        // Загружаем историю поиска для конкретного пользователя
+        const savedHistory = JSON.parse(localStorage.getItem(`searchHistory_${user.uid}`)) || [];
+        setSearchHistory(savedHistory);
       } else {
-        navigate("/login"); // Перенаправляем на страницу входа, если пользователь не аутентифицирован
+        navigate("/"); // Перенаправляем на страницу входа, если пользователь не аутентифицирован
       }
     });
 
@@ -71,16 +67,13 @@ const ChatPage = () => {
     }
   };
 
-  const goToProfile = async (userId) => {
+  const goToProfile = (userId) => {
     if (userUid) {
       const visitedUser = searchResults.find((user) => user.uid === userId);
       if (visitedUser) {
         const updatedHistory = [visitedUser, ...searchHistory.filter(item => item.uid !== visitedUser.uid)];
         setSearchHistory(updatedHistory);
-
-        // Сохраняем обновленную историю в Firebase
-        const dbRef = databaseRef(getDatabase(), `searchHistory/${userUid}`);
-        await set(dbRef, updatedHistory);
+        localStorage.setItem(`searchHistory_${userUid}`, JSON.stringify(updatedHistory));
       }
       navigate(`/profile/${userId}`);
     }
@@ -90,21 +83,15 @@ const ChatPage = () => {
     navigate("/authdetails");
   };
 
-  const clearSearchHistory = async () => {
+  const clearSearchHistory = () => {
     setSearchHistory([]);
-
-    // Очищаем историю поиска в Firebase
-    const dbRef = databaseRef(getDatabase(), `searchHistory/${userUid}`);
-    await set(dbRef, []);
+    localStorage.removeItem(`searchHistory_${userUid}`);
   };
 
-  const removeFromHistory = async (userId) => {
+  const removeFromHistory = (userId) => {
     const updatedHistory = searchHistory.filter(user => user.uid !== userId);
     setSearchHistory(updatedHistory);
-
-    // Обновляем историю поиска в Firebase
-    const dbRef = databaseRef(getDatabase(), `searchHistory/${userUid}`);
-    await set(dbRef, updatedHistory);
+    localStorage.setItem(`searchHistory_${userUid}`, JSON.stringify(updatedHistory));
   };
 
   const goToProfileFromHistory = (userId) => {
@@ -114,23 +101,12 @@ const ChatPage = () => {
   const handleLogout = () => {
     const auth = getAuth();
     auth.signOut().then(() => {
-      // Очищаем локальные данные и историю поиска
+      // Очищаем локальные данные
       setSearchHistory([]);
-      navigate("/login");
+      localStorage.removeItem(`searchHistory_${auth.currentUser.uid}`);
+      navigate("/");
     });
   };
-
-
-  const auth = getAuth();
-const user = auth.currentUser;
-
-if (user) {
-  // Выполняем запрос только если пользователь аутентифицирован
-  const dbRef = databaseRef(getDatabase(), "some-path");
-  // Делаем запрос к базе данных
-} else {
-  console.error("User is not authenticated");
-}
 
   return (
     <div className="chat-page">
@@ -173,9 +149,9 @@ if (user) {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              onFocus={() => setIsInputFocused(true)}
-              onBlur={() => setIsInputFocused(false)}
+              onChange={(e) => handleSearch(e.target.value)} // Отслеживание ввода
+              onFocus={() => setIsInputFocused(true)} // Устанавливаем фокус
+              onBlur={() => setIsInputFocused(false)} // Снимаем фокус
               placeholder="Искать пользователей"
             />
             <FaTimes className="close-search" onClick={() => setShowSearch(false)} />
@@ -196,7 +172,7 @@ if (user) {
                   className="chat-item"
                 >
                   <img src={user.avatarUrl || "./default-image.png"} alt={user.username} className="avatarka" />
-                  <div
+                  <div 
                     className="chat-info"
                     onClick={() => goToProfileFromHistory(user.uid)}
                   >

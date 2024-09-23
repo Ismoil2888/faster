@@ -1,9 +1,9 @@
+import React, { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { ref, set } from "firebase/database";
-import React, { useState } from "react";
-import { auth, database } from "../../firebase";  // Обязательно импортируйте и database
+import { auth, database } from "../../firebase";
 import { Link } from "react-router-dom";
-
+import { IoPersonOutline, IoMailOutline, IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 
 const SignUp = () => {
   const [username, setUsername] = useState("");
@@ -11,6 +11,16 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [copyPassword, setCopyPassword] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // Состояние для показа/скрытия пароля
+  const [showCopyPassword, setShowCopyPassword] = useState(false); // Состояние для подтверждения пароля
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleCopyPasswordVisibility = () => {
+    setShowCopyPassword(!showCopyPassword);
+  };
 
   const register = (e) => {
     e.preventDefault();
@@ -25,7 +35,7 @@ const SignUp = () => {
         const user = userCredential.user;
 
         // Сохраняем имя пользователя в Realtime Database
-        set(ref(database, 'users/' + user.uid), {
+        set(ref(database, "users/" + user.uid), {
           username: username,
           email: user.email,
         });
@@ -37,7 +47,7 @@ const SignUp = () => {
         setUsername("");
 
         // Перенаправление на AuthDetails после регистрации
-        window.location.href = '#/authdetails';
+        window.location.href = "#/authdetails";
       })
       .catch((error) => {
         console.log(error);
@@ -47,73 +57,72 @@ const SignUp = () => {
 
   return (
     <div className="section">
-     <div className="register-box">
-       <form onSubmit={register}>
-         <h2>Registration</h2>
-         <div className="reg-input-box">
-           <span className="icon">
-             <ion-icon name="person"></ion-icon>
-           </span>
-           <input
-            type="text"
-            maxLength="12"
-            name="user_name"
-            id="user_name"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-           />
-           <label htmlFor="user_name">Name</label>
-         </div>
-         <div className="reg-input-box">
-           <span className="icon">
-             <ion-icon name="mail"></ion-icon>
-           </span>
-           <input
-             type="email"
-             value={email}
-             onChange={(e) => setEmail(e.target.value)}
-           />
-           <label>Email</label>
-         </div>
-         <div className="reg-input-box">
-           <span className="icon far fa-eye">
-             <ion-icon id="eye-icon" name="eye"></ion-icon>
-           </span>
-           <input
-             type="password"
-             value={password}
-             onChange={(e) => setPassword(e.target.value)}
-           />
-           <label>Password</label>
-         </div>
-         <div className="reg-input-box">
-           <span className="icon">
-             <ion-icon name="lock-closed"></ion-icon>
-           </span>
-           <input
-             type="password"
-             value={copyPassword}
-             onChange={(e) => setCopyPassword(e.target.value)}
-           />
-           <label>Confirm Password</label>
-         </div>
-         <div className="remember-forgot">
-           <label>
-             <input type="checkbox" /> Remember me
-           </label>
-           <p>Forgot Password?</p>
-         </div>
-         <button type="submit">Register</button>
-         {error && <p style={{ color: "red" }}>{error}</p>}
-         <div className="register-link">
-         <p>
-           Already have an account? 
-           <Link className="a" to="/">Login</Link>
-         </p>
-         </div>
-       </form>
-     </div>
-     </div>
+      <div className="register-box">
+        <form onSubmit={register}>
+          <h2>Registration</h2>
+          <div className="reg-input-box">
+            <span className="icon">
+              <IoPersonOutline /> {/* Замена на иконку профиля */}
+            </span>
+            <input
+              type="text"
+              maxLength="12"
+              name="user_name"
+              id="user_name"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <label htmlFor="user_name">Name</label>
+          </div>
+          <div className="reg-input-box">
+            <span className="icon">
+              <IoMailOutline /> {/* Замена на иконку email */}
+            </span>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <label>Email</label>
+          </div>
+          <div className="reg-input-box">
+            <span className="icon" onClick={togglePasswordVisibility} style={{ cursor: "pointer" }}>
+              {showPassword ? <IoEyeOutline /> : <IoEyeOffOutline />} {/* Переключение иконки */}
+            </span>
+            <input
+              type={showPassword ? "text" : "password"} // Переключение типа input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <label>Password</label>
+          </div>
+          <div className="reg-input-box">
+            <span className="icon" onClick={toggleCopyPasswordVisibility} style={{ cursor: "pointer" }}>
+              {showCopyPassword ? <IoEyeOutline /> : <IoEyeOffOutline />} {/* Переключение иконки */}
+            </span>
+            <input
+              type={showCopyPassword ? "text" : "password"} // Переключение типа input
+              value={copyPassword}
+              onChange={(e) => setCopyPassword(e.target.value)}
+            />
+            <label>Confirm Password</label>
+          </div>
+          <div className="remember-forgot">
+            <label>
+              <input type="checkbox" /> Remember me
+            </label>
+            <p>Forgot Password?</p>
+          </div>
+          <button type="submit">Register</button>
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          <div className="register-link">
+            <p>
+              Already have an account? <Link className="a" to="/">Login</Link>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 
