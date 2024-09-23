@@ -184,9 +184,6 @@ const AuthDetails = () => {
 
   return (
     <div className="profile-container">
-       <Link className="back-button" to="/chatpage">
-        <FaArrowLeft />
-      </Link>
       {authUser ? (
         <div className="profile-content">
           {notification && (
@@ -194,6 +191,10 @@ const AuthDetails = () => {
               {notification}
             </div>
          )} {/* Уведомление */}
+
+      <Link className="back-button" to="/chatpage">
+        <FaArrowLeft />
+      </Link>
 
           <div className="profile-header">
             <div className="avatar-section">
