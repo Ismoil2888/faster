@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { FaEllipsisV, FaSearch, FaTimes } from "react-icons/fa";
 import { getDatabase, ref as databaseRef, query, orderByChild, startAt, endAt, get } from "firebase/database";
 import { useNavigate } from "react-router-dom";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const ChatPage = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -9,26 +10,30 @@ const ChatPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searchHistory, setSearchHistory] = useState([]);
+  const [isInputFocused, setIsInputFocused] = useState(false); // Новое состояние
   const menuRef = useRef(null);
   const navigate = useNavigate();
-
-  // Загружаем историю поиска из localStorage при загрузке компонента
-  useEffect(() => {
-    const savedHistory = JSON.parse(localStorage.getItem("searchHistory")) || [];
-    setSearchHistory(savedHistory);
-  }, []);
+  const [userUid, setUserUid] = useState(null);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setShowMenu(false);
+    const auth = getAuth();
+
+    // Отслеживаем аутентификацию пользователя
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Пользователь вошел в систему, используем его UID
+        setUserUid(user.uid);
+
+        // Загружаем историю поиска для конкретного пользователя
+        const savedHistory = JSON.parse(localStorage.getItem(`searchHistory_${user.uid}`)) || [];
+        setSearchHistory(savedHistory);
+      } else {
+        navigate("/login"); // Перенаправляем на страницу входа, если пользователь не аутентифицирован
       }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    });
+
+    return () => unsubscribe();
+  }, [navigate]);
 
   const handleSearch = async (queryText) => {
     setSearchQuery(queryText);
@@ -62,37 +67,45 @@ const ChatPage = () => {
     }
   };
 
-  // Функция для перехода на профиль и добавления аккаунта в историю после посещения
   const goToProfile = (userId) => {
-    const visitedUser = searchResults.find((user) => user.uid === userId);
-    if (visitedUser) {
-      const updatedHistory = [visitedUser, ...searchHistory.filter(item => item.uid !== visitedUser.uid)];
-      setSearchHistory(updatedHistory);
-      localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+    if (userUid) {
+      const visitedUser = searchResults.find((user) => user.uid === userId);
+      if (visitedUser) {
+        const updatedHistory = [visitedUser, ...searchHistory.filter(item => item.uid !== visitedUser.uid)];
+        setSearchHistory(updatedHistory);
+        localStorage.setItem(`searchHistory_${userUid}`, JSON.stringify(updatedHistory));
+      }
+      navigate(`/profile/${userId}`);
     }
-    navigate(`/profile/${userId}`);
   };
 
   const goToProfileSettings = () => {
     navigate("/authdetails");
   };
 
-  // Функция для очистки истории поиска
   const clearSearchHistory = () => {
     setSearchHistory([]);
-    localStorage.removeItem("searchHistory");
+    localStorage.removeItem(`searchHistory_${userUid}`);
   };
 
-  // Функция для удаления конкретного элемента из истории
   const removeFromHistory = (userId) => {
     const updatedHistory = searchHistory.filter(user => user.uid !== userId);
     setSearchHistory(updatedHistory);
-    localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+    localStorage.setItem(`searchHistory_${userUid}`, JSON.stringify(updatedHistory));
   };
 
-  // Добавление обработчика для перехода на профиль из истории
   const goToProfileFromHistory = (userId) => {
     navigate(`/profile/${userId}`);
+  };
+
+  const handleLogout = () => {
+    const auth = getAuth();
+    auth.signOut().then(() => {
+      // Очищаем локальные данные
+      setSearchHistory([]);
+      localStorage.removeItem(`searchHistory_${auth.currentUser.uid}`);
+      navigate("/login");
+    });
   };
 
   return (
@@ -102,24 +115,21 @@ const ChatPage = () => {
           <FaEllipsisV />
         </div>
 
-      {/* Секция для отображения историй */}
-      <div className="stories-section">
-        <div className="story-item">
-          <img
-            src="./default-story.png"
-            alt="Моя история"
-            className="story-avatar"
-          />
-          <p>Моя история</p>
+        {/* Секция для отображения историй */}
+        <div className="stories-section">
+          <div className="story-item">
+            <img
+              src="./default-story.png"
+              alt="Моя история"
+              className="story-avatar"
+            />
+            <p>Моя история</p>
+          </div>
         </div>
-        {/* Добавьте другие истории пользователей здесь */}
-      </div>
 
-      {/* <h1>Faster</h1> */}
-
-      <div className="search-icon" onClick={() => setShowSearch(!showSearch)}>
+        <div className="search-icon" onClick={() => setShowSearch(!showSearch)}>
           <FaSearch />
-      </div>
+        </div>
       </div>
 
       {showMenu && (
@@ -128,26 +138,27 @@ const ChatPage = () => {
             <li onClick={goToProfileSettings}>Настройки профиля</li>
             <li>Конфиденциальность</li>
             <li>Помощь</li>
-            <li>Выход</li>
+            <li onClick={handleLogout}>Выход</li>
           </ul>
         </div>
       )}
 
       {showSearch && (
         <>
-          {/* Поисковая строка */}
           <div className="search-bar">
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)} // Отслеживание ввода
+              onFocus={() => setIsInputFocused(true)} // Устанавливаем фокус
+              onBlur={() => setIsInputFocused(false)} // Снимаем фокус
               placeholder="Искать пользователей"
             />
             <FaTimes className="close-search" onClick={() => setShowSearch(false)} />
           </div>
 
-          {/* Отображаем историю поиска при активном поиске */}
-          {searchHistory.length > 0 && (
+          {/* Если пользователь не вводит текст и не в фокусе - показываем историю */}
+          {searchHistory.length > 0 && !isInputFocused && searchQuery === "" && (
             <div className="search-history">
               <div className="history-header">
                 <h3>Недавнее</h3>
@@ -159,10 +170,12 @@ const ChatPage = () => {
                 <div
                   key={user.uid}
                   className="chat-item"
-                  onClick={() => goToProfileFromHistory(user.uid)} // Добавляем обработчик клика
                 >
                   <img src={user.avatarUrl || "./default-image.png"} alt={user.username} className="avatarka" />
-                  <div className="chat-info">
+                  <div 
+                    className="chat-info"
+                    onClick={() => goToProfileFromHistory(user.uid)}
+                  >
                     <h3>{user.username}</h3>
                     <p>{user.aboutMe || "No info available"}</p>
                   </div>
@@ -174,7 +187,6 @@ const ChatPage = () => {
         </>
       )}
 
-      {/* Результаты поиска */}
       {showSearch && (
         <div className="chat-list">
           {searchResults.length > 0 ? (
