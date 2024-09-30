@@ -10,6 +10,10 @@ const UserProfilePage = () => {
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const navigate = useNavigate();
 
+  const handleSendMessage = () => {
+    navigate(`/chat/${userId}`); // Redirect to the ChatWindow with recipient ID
+  };
+
   useEffect(() => {
     const db = getDatabase();
     const userRef = databaseRef(db, `users/${userId}`);
@@ -74,7 +78,7 @@ const UserProfilePage = () => {
       <p>{onlineStatus}</p>
       <p>Информация: {userData.aboutMe || "No additional info"}</p>
 
-      <button className="message-button">
+      <button className="message-button" onClick={handleSendMessage}>
         <FaEnvelope /> Send Message
       </button>
 

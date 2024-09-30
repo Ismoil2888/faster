@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase";
 import { Link } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import { IoEyeOutline, IoEyeOffOutline, IoMailOutline } from "react-icons/io5";
 
 const SignIn = () => {
@@ -13,6 +14,8 @@ const SignIn = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  const navigate = useNavigate();
 
   const logIn = (e) => {
     e.preventDefault();
@@ -57,6 +60,7 @@ const SignIn = () => {
               type={showPassword ? "text" : "password"} // Переключение типа input
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              minLength="6"
               required
             />
             <label htmlFor="password">Password</label>
@@ -81,109 +85,3 @@ const SignIn = () => {
 };
 
 export default SignIn;
-
-
-// import { signInWithEmailAndPassword } from "firebase/auth";
-// import React, { useState } from "react";
-// import { auth } from "../../firebase";
-// import { Link } from "react-router-dom";
-
-// const SingIn = () => {
-//     const [email, setEmail] = useState("");
-//     const [password, setPassword] = useState("");
-//     const [error, setError] = useState("");
-
-//     function logIn(e) {
-//         e.preventDefault();
- 
-//         signInWithEmailAndPassword(auth, email, password)
-//         .then((user) => {
-//             console.log(user);
-//             setError("");
-//             setEmail("");
-//             setPassword("");
-//             window.location.href = "/authdetails"; // Перенаправление после успешного входа
-//         })
-//         .catch((error) => {
-//             console.log(error);
-//             setError("Аккаунт не найден!");
-//         });
-//     }
-
-//     return (
-      
-//         <div>
-//             <form className="loginblock2" onSubmit={logIn}>
-//                 <h2>Login</h2>
-//                 <input 
-//                     value={email} 
-//                     onChange={(e) => setEmail(e.target.value)} 
-//                     type="email" 
-//                     placeholder="Email" 
-//                 />
-//                 <input 
-//                     value={password} 
-//                     onChange={(e) => setPassword(e.target.value)} 
-//                     type="password" 
-//                     placeholder="Password" 
-//                 />
-//                 <button type="submit">Login</button>
-//                 {error && <p style={{ color: "red" }}>{error}</p>}
-//                 <p>
-//                     Нет аккаунта?{" "}
-//                     <Link to="/signup">зарегистрируйся</Link>
-//                 </p>
-//             </form>
-//         </div>
-//     );
-// };
-
-// export default SingIn;
-
-
-
-// import { signInWithEmailAndPassword } from "firebase/auth";
-// import React, { useState } from "react";
-// import { auth } from "../../firebase";
-
-// const SignIn = () => {
-//     const [email, setEmail] = useState("");
-//     const [password, setPassword] = useState("");
-//     const [CopyPassword, setCopyPassword] = useState("");
-//     const [error, setError] = useState("");
-//     function logIn(e) {
-//         e.preventDefault();
- 
-//         signInWithEmailAndPassword(auth, email, password)
-//         .then((user) => {
-//             console.log(user);
-//             setError("");
-//             setEmail("");
-//             setPassword("");
-//         })
-//         .catch((error) => {
-//              console.log(error);
-//              setError("Аккаунт не найден!")
-//         });
-//     }
-
-//     return (
-//         <div>
-//         <form className="loginblock2">
-//             <h2>Login</h2>
-//           <input 
-//           value={email} 
-//           onChange={(e) => setEmail(e.target.value)} 
-//           type="email" placeholder='email' />
-//           <input 
-//           value={password} 
-//           onChange={(e) => setPassword(e.target.value)} 
-//           type="password" placeholder='password' />
-//           <button onClick={logIn}>Login</button>
-//           {error ? <p style={{color: "red"}}>{error}</p> : ""}
-//         </form>
-//       </div>
-//     );
-// }
-
-// export default SignIn;

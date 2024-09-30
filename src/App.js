@@ -7,6 +7,8 @@ import AuthDetails from './components/auth/AuthDetails';
 import NotfoundPage from './components/NotfoundPage';
 import ChatPage from "./components/auth/ChatPage";
 import UserProfilePage from "./components/auth/UserProfilePage"; // Импортируем компонент профиля пользователя
+import ChatWindow from "./components/auth/ChatWindow";
+import Message from "./components/auth/Message";
 
 function App() {
   return (
@@ -16,6 +18,7 @@ function App() {
           <Route path="/authdetails" element={<AuthDetails />} />
           <Route path="/chatpage" element={<ChatPage />} />
           <Route path="/profile/:userId" element={<UserProfilePage />} />
+          <Route path="/chat/:userId" element={<ChatWindow />} /> {/* Новый маршрут для чата */}          <Route path="/message" element={<Message />} />
           <Route path="*" element={<NotfoundPage />} />
         </Routes>
   );
