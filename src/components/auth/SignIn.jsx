@@ -67,7 +67,7 @@ const SignIn = () => {
           </div>
           <div className="remember-forgot">
             <label>
-              <input type="checkbox" /> Remember me
+              <input type="checkbox" /> I have read the terms of use
             </label>
             <p>Forgot Password?</p>
           </div>

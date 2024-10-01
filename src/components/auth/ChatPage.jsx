@@ -3,8 +3,6 @@ import { FaEllipsisV, FaSearch, FaTimes } from "react-icons/fa";
 import { getDatabase, ref as databaseRef, query, orderByChild, startAt, endAt, get } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { Link } from "react-router-dom";
-
 
 const ChatPage = () => {
   const [showMenu, setShowMenu] = useState(false);

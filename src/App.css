@@ -455,12 +455,6 @@
     z-index: 9999; /* Поверх всех элементов */
   }
   
-  .full-size-avatar {
-    max-width: 90%;
-    max-height: 90%;
-    cursor: pointer;
-  }
-  
   .avatar-overlay {
     display: flex;
     justify-content: center;
@@ -1027,7 +1021,7 @@
 
 .avatar-small {
   width: 40px;
-  height: 40px;
+  height: 42px;
   border-radius: 50%;
 }
 
