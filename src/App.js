@@ -17,7 +17,7 @@ function App() {
           <Route path="/authdetails" element={<AuthDetails />} />
           <Route path="/chatpage" element={<ChatPage />} />
           <Route path="/profile/:userId" element={<UserProfilePage />} />
-          <Route path="/chat/:userId" element={<ChatWindow />} /> {/* Новый маршрут для чата */}          <Route path="/message" element={<Message />} />
+          <Route path="/chat/:userId" element={<ChatWindow />} />
           <Route path="*" element={<NotfoundPage />} />
         </Routes>
   );
