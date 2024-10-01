@@ -8,7 +8,6 @@ import NotfoundPage from './components/NotfoundPage';
 import ChatPage from "./components/auth/ChatPage";
 import UserProfilePage from "./components/auth/UserProfilePage"; // Импортируем компонент профиля пользователя
 import ChatWindow from "./components/auth/ChatWindow";
-import Message from "./components/auth/Message";
 
 function App() {
   return (
